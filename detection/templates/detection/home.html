@@ -1,0 +1,57 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TB Detection Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'detection/css/style.css' %}">
+
+</head>
+<body>
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <h1>TB Detection Dashboard</h1>
+        </header>
+
+        <main class="dashboard-main">
+            <section class="card upload-section">
+                <h2>Upload X-ray Image</h2>
+                <div class="upload-area">
+                    <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+                    <button id="uploadButton" class="btn">Choose Image</button>
+                    <p id="fileNameDisplay" class="file-name-display"></p>
+                    <div class="image-preview" id="imagePreview">
+                        <img id="uploadedImage" src="#" alt="Image Preview" style="display: none;">
+                        <p id="previewPlaceholder">No image selected</p>
+                    </div>
+                </div>
+                <button id="predictButton" class="btn predict-btn" disabled>Detect TB</button>
+            </section>
+
+            <section class="card results-section">
+                <h2>Detection Results</h2>
+                <div class="results-content">
+                    <p class="result-label">Status:</p>
+                    <p id="detectionStatus" class="result-value initial-state">Awaiting Prediction</p>
+
+                    <p class="result-label">Confidence:</p>
+                    <p id="confidenceScore" class="result-value initial-state">N/A</p>
+
+                    <div class="result-details">
+                        </div>
+                </div>
+            </section>
+
+            </main>
+    </div>
+
+    <script src="script.js"></script>
+    
+    <script src="{% static 'detection/js/script.js' %}"></script>
+
+</body>
+</html>
