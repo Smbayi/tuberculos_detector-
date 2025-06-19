@@ -1,3 +1,4 @@
+// ... (Your previous JavaScript code for image upload and prediction) ...
 document.addEventListener('DOMContentLoaded', () => {
     const imageUpload = document.getElementById('imageUpload');
     const uploadButton = document.getElementById('uploadButton');
@@ -11,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let selectedFile = null;
 
-    // Trigger file input click when "Choose Image" button is clicked
     uploadButton.addEventListener('click', () => {
         imageUpload.click();
     });
@@ -20,9 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedFile = event.target.files[0];
         if (selectedFile) {
             fileNameDisplay.textContent = selectedFile.name;
-            predictButton.disabled = false; // Enable predict button
+            predictButton.disabled = false;
 
-            // Display image preview
             const reader = new FileReader();
             reader.onload = (e) => {
                 uploadedImage.src = e.target.result;
@@ -31,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             reader.readAsDataURL(selectedFile);
 
-            // Reset results
             detectionStatus.textContent = 'Awaiting Prediction';
             detectionStatus.className = 'result-value initial-state';
             confidenceScore.textContent = 'N/A';
@@ -39,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } else {
             fileNameDisplay.textContent = '';
-            predictButton.disabled = true; // Disable predict button
+            predictButton.disabled = true;
             uploadedImage.style.display = 'none';
             previewPlaceholder.style.display = 'block';
         }
@@ -51,44 +49,37 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // --- Simulate API call to your ML model ---
-        // In a real application, you would send `selectedFile` to your backend
-        // where your ML model is hosted (e.g., using Flask, FastAPI, Node.js).
-        // The backend would then process the image and return the prediction.
-
-        detectionStatus.textContent = 'Predicting...';
+        detectionStatus.textContent = 'Prediction en cours';
         detectionStatus.className = 'result-value initial-state';
-        confidenceScore.textContent = 'Loading...';
+        confidenceScore.textContent = 'Chargement...';
         confidenceScore.className = 'result-value initial-state';
-        predictButton.disabled = true; // Disable button during prediction
+        predictButton.disabled = true;
 
         try {
             // Simulate a network delay (replace with actual fetch to your API)
-            await new Promise(resolve => setTimeout(resolve, 2000)); // 2-second delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
 
-            // --- Simulate ML Model Response ---
-            // Replace this with the actual response from your backend
-            const simulatedPrediction = Math.random(); // A random number between 0 and 1
-            const threshold = 0.5; // Example threshold for TB detection
+            const simulatedPrediction = Math.random();
+            const threshold = 0.5;
 
             let statusText = '';
             let confidenceText = '';
             let statusClass = '';
 
             if (simulatedPrediction > threshold) {
-                statusText = 'Tuberculosis Detected';
+                statusText = 'Tuberculose detecté';
                 statusClass = 'result-value positive';
                 confidenceText = `${(simulatedPrediction * 100).toFixed(2)}%`;
             } else {
-                statusText = 'No Tuberculosis Detected';
+                statusText = 'Aucune tuberculose detecté';
                 statusClass = 'result-value negative';
-                confidenceText = `${((1 - simulatedPrediction) * 100).toFixed(2)}%`; // Confidence in being negative
+                confidenceText = `${((1 - simulatedPrediction) * 100).toFixed(2)}%`;
             }
 
             detectionStatus.textContent = statusText;
-            detectionStatus.className = statusClass; // Apply dynamic class for color
+            detectionStatus.className = statusClass;
             confidenceScore.textContent = confidenceText;
-            confidenceScore.className = statusClass; // Apply dynamic class for color
+            confidenceScore.className = statusClass;
 
         } catch (error) {
             console.error('Error during prediction:', error);
@@ -98,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
             confidenceScore.className = 'result-value initial-state';
             alert('An error occurred during prediction. Please try again.');
         } finally {
-            predictButton.disabled = false; // Re-enable button
+            predictButton.disabled = false;
         }
     });
 });

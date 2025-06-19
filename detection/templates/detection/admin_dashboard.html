@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - TB Detector</title>
+    <link rel="stylesheet" href="{% static 'detection/css/admin.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+</head>
+<body>
+<div class="admin-container">
+    <aside class="sidebar">
+        <h2>Admin Panel</h2>
+        <ul>
+            <li><a href="#" class="active">Dashboard</a></li>
+            <li><a href="#">Traitements</a></li>
+            <li><a href="#">Patients</a></li>
+            <li><a href="#">Paramètres</a></li>
+        </ul>
+    </aside>
+
+    <div class="main-content">
+        <header>
+            <h1>Dashboard Admin</h1>
+            <a class="btn-detecter" href="{% url 'detection' %}">DÉTECTER</a>
+        </header>
+
+        <!-- KPIs -->
+        <section class="kpi-section">
+            <div class="kpi-card">
+                <h3>Patients Consultés</h3>
+                <p id="kpi-patients">{{ patients }}</p>
+            </div>
+            <div class="kpi-card">
+                <h3>Cas de Tuberculose</h3>
+                <p id="kpi-cas">{{ cas_tb }}</p>
+            </div>
+            <div class="kpi-card">
+                <h3>Source Principale</h3>
+                <p id="kpi-source">{{ source }}</p>
+            </div>
+            <div class="kpi-card">
+                <h3>Dernière Analyse</h3>
+                <p id="kpi-date">{{ date }}</p>
+            </div>
+        </section>
+
+        <!-- Graphiques -->
+        <section class="charts-grid">
+            <canvas id="chart-consultations"></canvas>
+            <canvas id="chart-source"></canvas>
+            <canvas id="chart-modele"></canvas>
+            <canvas id="chart-profit"></canvas>
+        </section>
+    </div>
+</div>
+<script src="{% static 'detection/js/admin.js' %}"></script>
+
+<!-- Données pour JavaScript -->
+<script id="chart-data" type="application/json">
+    {{ chart_data|safe|json_script:"chart-data" }}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+</html>

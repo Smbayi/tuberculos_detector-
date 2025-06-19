@@ -2,5 +2,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.home, name='home'),
+    path('detection/', views.detection, name='detection'),
+    path('', views.admin_dashboard, name='admin_dashboard'),  # page principale par défaut
 ]
