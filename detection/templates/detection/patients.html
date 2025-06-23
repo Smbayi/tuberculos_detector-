@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Patients</title>
+    <link rel="stylesheet" href="{% static 'detection/css/patients.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Liste des Patients</h1>
+            <a href="{% url 'admin_dashboard' %}" class="back-button">Retour au Dashboard</a>
+        </header>
+
+        <section class="stats">
+            <div class="card">Total Patients: {{ total_patients }}</div>
+            <div class="card">Tuberculose: {{ atteints }}</div>
+            <div class="card">Non Ateints: {{ non_atteints }}</div>
+        </section>
+
+        <section class="charts">
+            <canvas id="tbChart"></canvas>
+        </section>
+
+        <section class="patients-list">
+            {% for patient in patients %}
+            <div class="patient-card">
+                <img src="{{ patient.image.url }}" alt="photo patient">
+                <div>
+                    <p><strong>Nom:</strong> {{ patient.nom }}</p>
+                    <p><strong>Âge:</strong> {{ patient.age }}</p>
+                    <p><strong>Genre:</strong> {{ patient.genre }}</p>
+                    <p><strong>Cas:</strong> {{ patient.resultat_test }}</p>
+                </div>
+            </div>
+            {% empty %}
+            <p>Aucun patient enregistré.</p>
+            {% endfor %}
+        </section>
+    </div>
+
+    <script src="{% static 'detection/js/patients.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Paramètres</title>
+    <link rel="stylesheet" href="{% static 'detection/css/parametres.css' %}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Paramètres du système</h1>
+            <a href="{% url 'admin_dashboard' %}" class="btn-back">← Retour au Dashboard</a>
+        </header>
+
+        <section class="param-section">
+            <h2>Paramètres du Modèle IA</h2>
+            <label>Modèle utilisé :
+                <select>
+                    <option>Deep Learning CNN</option>
+                    <option>Random Forest</option>
+                    <option>SVM</option>
+                </select>
+            </label>
+            <label>Seuil de détection :
+                <input type="number" value="0.5" step="0.01" min="0" max="1">
+            </label>
+        </section>
+
+        <section class="param-section">
+            <h2>Affichage</h2>
+            <label>Thème :
+                <select>
+                    <option>Clair</option>
+                    <option>Sombre</option>
+                </select>
+            </label>
+            <label>Langue :
+                <select>
+                    <option>Français</option>
+                    <option>Anglais</option>
+                </select>
+            </label>
+        </section>
+
+        <section class="param-section">
+            <h2>Compte Administrateur</h2>
+            <label>Changer Email :
+                <input type="email" placeholder="admin@example.com">
+            </label>
+            <label>Changer mot de passe :
+                <input type="password" placeholder="Nouveau mot de passe">
+            </label>
+        </section>
+
+        <section class="param-section">
+            <h2>Données</h2>
+            <button class="btn">Exporter les données</button>
+            <button class="btn btn-danger">Supprimer les données</button>
+        </section>
+    </div>
+
+    <script src="{% static 'detection/js/parametres.js' %}"></script>
+</body>
+</html>

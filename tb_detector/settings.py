@@ -12,7 +12,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
+    'django.contrib.sessions',  
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'detection',
@@ -20,10 +20,11 @@ INSTALLED_APPS = [
 
 # Configure les fichiers statiques
 STATIC_URL = '/static/'
+
+
 # Pour que Django trouve les fichiers dans static/
-STATICFILES_DIRS = [
-    BASE_DIR / "detection" / "static",
-]
+#STATICFILES_DIRS = [
+ #   BASE_DIR / "detection" / "static",]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -72,3 +73,13 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# settings.py
+import os
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),  # pour les fichiers statiques globaux
+]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # pour collectstatic en prod

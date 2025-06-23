@@ -1,0 +1,37 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Informations Patient</title>
+    <link rel="stylesheet" href="{% static 'detection/css/informations.css' %}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <h1>Enregistrement du patient</h1>
+        </header>
+        <main class="dashboard-main">
+            <section class="card">
+                <form method="POST">
+                    {% csrf_token %}
+                    <label>Nom complet :</label>
+                    <input type="text" name="nom" required><br><br>
+
+                    <label>Âge :</label>
+                    <input type="number" name="age" required><br><br>
+
+                    <label>Genre :</label>
+                    <select name="genre" required>
+                        <option value="Homme">Homme</option>
+                        <option value="Femme">Femme</option>
+                    </select><br><br>
+
+                    <a href="{% url 'detection' %}" class="btn"  >Valider et passer à la détection</a>
+                      
+                </form>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
