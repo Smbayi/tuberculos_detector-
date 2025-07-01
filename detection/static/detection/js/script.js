@@ -88,3 +88,24 @@ document.addEventListener('DOMContentLoaded', () => {
         predictButton.disabled = false;
     });
 });
+
+
+    // Active JS pour le fichier
+    const uploadBtn = document.getElementById("uploadButton");
+    const fileInput = document.getElementById("imageUpload");
+    const fileNameDisplay = document.getElementById("fileNameDisplay");
+    const predictButton = document.getElementById("predictButton");
+
+    uploadBtn.addEventListener("click", () => fileInput.click());
+
+    fileInput.addEventListener("change", () => {
+        if (fileInput.files.length > 0) {
+            const fileName = fileInput.files[0].name;
+            fileNameDisplay.textContent = fileName;
+            predictButton.disabled = false;
+            document.getElementById("previewPlaceholder").style.display = "none";
+            const preview = document.getElementById("uploadedImage");
+            preview.src = URL.createObjectURL(fileInput.files[0]);
+            preview.style.display = "block";
+        }
+    });

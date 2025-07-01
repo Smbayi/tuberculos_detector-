@@ -1,4 +1,5 @@
 from pathlib import Path
+from mongoengine import connect
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -16,6 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'detection',
+     
 ]
 
 # Configure les fichiers statiques
@@ -56,12 +58,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'tb_detector.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#    'default': {
+ #       'ENGINE': 'django.db.backends.sqlite3',
+ #       'NAME': BASE_DIR / 'db.sqlite3',
+ #   }
+#}
 
 AUTH_PASSWORD_VALIDATORS = []
 
@@ -75,11 +77,13 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# settings.py
-import os
+connect(
+    db="tb_detector_db",
+    host="localhost",
+    port=27017
+)
 
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),  # pour les fichiers statiques globaux
-]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # pour collectstatic en prod
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+

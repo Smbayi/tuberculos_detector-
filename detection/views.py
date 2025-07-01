@@ -8,7 +8,6 @@ import io
 import urllib, base64
 from datetime import datetime
 from io import BytesIO
-from django.shortcuts import render
 from django.core.files.uploadedfile import UploadedFile
 import random
 from .forms import PatientForm
@@ -16,7 +15,10 @@ from .models import Patient
 from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 from django.urls import reverse
-from .models import Patient
+from .forms import PatientForm
+from bson import ObjectId
+from .forms import InformationsForm
+from django.core.files.storage import FileSystemStorage
 
 
 
@@ -34,27 +36,6 @@ def is_valid_radiography(image: UploadedFile) -> bool:
 
     ext = image.name.lower().split('.')[-1]
     return f".{ext}" in valid_extensions
-
-def predict_tb(image):
-    return random.choice(["Tuberculose détectée", "Pas de tuberculose"])
-
-def detection(request):
-    prediction = None
-    patient_info = request.session.get("patient_info")
-
-    if patient_info:
-        image_path = patient_info["image_name"]
-        image_file = default_storage.open(image_path)
-
-        prediction = predict_tb(image_file)
-        patient_info["prediction"] = prediction
-
-        # TODO : ici, tu peux stocker dans la base de données si tu veux
-
-    return render(request, "detection/detection.html", {
-        "prediction": prediction,
-        "patient": patient_info
-    })
 
 
 
@@ -99,62 +80,99 @@ def admin_dashboard(request):
 def traitements_view(request):
     return render(request, 'detection/traitements.html')
 
+def parametres_view(request):
+    return render(request, 'detection/parametres.html')
+
+
+def predict_tb(image):
+    return random.choice(["Tuberculose détectée", "Pas de tuberculose"])
+
+
+def detection(request):
+    prediction = None
+    patient = None
+
+    patient_id = request.session.get('current_patient_id')
+
+    if patient_id:
+        patient = Patient.objects.get(id=patient_id)
+
+        if request.method == 'POST' and 'image' in request.FILES:
+            image = request.FILES['image']
+            image_name = default_storage.save(f"images/{image.name}", image)
+
+            prediction = predict_tb(image)
+
+            # Mise à jour du patient
+            patient.image = image_name
+            patient.resultat_test = prediction
+            patient.save()
+
+    return render(request, 'detection/detection.html', {
+        'prediction': prediction,
+        'patient': patient
+    })
+
 
 
 
 def informations_view(request):
     if request.method == 'POST':
-        nom = request.POST.get('nom')
-        age = request.POST.get('age')
-        genre = request.POST.get('genre')
+        form = InformationsForm(request.POST)
+        if form.is_valid():
+            # Enregistre les infos dans MongoDB via MongoEngine
+            patient = Patient(
+                nom=form.cleaned_data['nom'],
+                age=form.cleaned_data['age'],
+                genre=form.cleaned_data['genre'],
+            )
+            patient.save()
+            # Stocker l'ID dans la session
+            request.session['patient_id'] = str(patient.id)
+            return redirect('detection')
+    else:
+        form = InformationsForm()
+    return render(request, 'informations.html', {'form': form})
 
-        # Enregistre le patient
-        patient = {
-            'nom': nom,
-            'age': age,
-            'genre': genre
-        }
-        PATIENTS.append(patient)
-
-        # Stocke en session pour affichage futur si tu veux
-        request.session['current_patient'] = patient
-
-        return redirect('detection_page')
-    
-    return render(request, 'detection/informations.html')
 
 def detection_view(request):
-    prediction = None
-    if request.method == "POST" and "image" in request.FILES:
-        image = request.FILES["image"]
-        prediction = predict_tb(image)
-    
-    return render(request, 'detection/detection.html', {
-        "prediction": prediction,
-        "patient": request.session.get('current_patient')
-    })
+    patient_id = request.session.get('patient_id')
+    if not patient_id:
+        return redirect('informations')
 
-def predict_tb(image):
-    # Simule la prédiction
-    return random.choice(["Tuberculose détectée", "Pas de tuberculose"])
+    # On récupère le patient depuis MongoEngine
+    try:
+        patient = Patient.objects.get(id=patient_id)
+    except Patient.DoesNotExist:
+        return redirect('informations')
 
+    if request.method == 'POST' and 'image' in request.FILES:
+        image = request.FILES['image']
+        fs = FileSystemStorage(location='media/patients_images/')
+        filename = fs.save(image.name, image)
+        patient.image = f'patients_images/{filename}'
+
+        # Simulation résultat IA
+        if 'tuberculose' in image.name.lower():
+            patient.resultat_test = "Atteint de la tuberculose"
+        else:
+            patient.resultat_test = "Non atteint"
+
+        patient.save()
+        return redirect('patients')
+
+    return render(request, 'detection.html', {'patient': patient})
 
 
 def patients_view(request):
     patients = Patient.objects.all()
-
-    total_patients = patients.count()
-    atteints = patients.filter(resultat_test="Atteint").count()
+    total = patients.count()
+    atteints = patients.filter(resultat_test="Atteint de la tuberculose").count()
     non_atteints = patients.filter(resultat_test="Non atteint").count()
 
-    context = {
-       'patients': patients,
-    'total': total_patients,
-    'positif': atteints,
-    'negatif': non_atteints,
-    }
-
-    return render(request, 'detection/patients.html', context)
-
-def parametres_view(request):
-    return render(request, 'detection/parametres.html')
+    return render(request, 'patients.html', {
+        'patients': patients,
+        'total': total,
+        'atteints': atteints,
+        'non_atteints': non_atteints
+    })

@@ -1,6 +1,4 @@
-DETECTION PAGE 
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,75 +8,79 @@ DETECTION PAGE
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'detection/css/style.css' %}">
     
-
-
 </head>
 <body>
-    <div class="dashboard-container">
-        <header class="dashboard-header">
-            <h1>TABLEAU D'ANALYSE</h1>
-        </header>
-<a href="{% url 'admin_dashboard' %}" class="btn dashboard-return">← Retour au dashboard</a>
+<div class="dashboard-container">
+    <header class="dashboard-header">
+        <h1>TABLEAU D'ANALYSE</h1>
+    </header>
+    <a href="{% url 'admin_dashboard' %}" class="btn dashboard-return">← Retour au dashboard</a>
 
-        <main class="dashboard-main">
-            <section class="card upload-section">
-                <h2>Inserez votre image de RADIOGRAPHIE</h2>
+    <main class="dashboard-main">
+        <section class="card upload-section">
+            <h2>Inserez votre image de RADIOGRAPHIE</h2>
+
+            <!-- ✅ FORMULAIRE ICI -->
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
                 <div class="upload-area">
-                    <input type="file" id="imageUpload" accept="image/*" style="display: none;">
-                    <button id="uploadButton" class="btn">Choisir Image</button>
+                    <input type="file" id="imageUpload" name="image" accept="image/*" required style="display: none;">
+                    <button type="button" id="uploadButton" class="btn">Choisir Image</button>
                     <p id="fileNameDisplay" class="file-name-display"></p>
+
                     <div class="image-preview" id="imagePreview">
                         <img id="uploadedImage" src="#" alt="Image Preview" style="display: none;">
                         <p id="previewPlaceholder">Aucune image selectionée</p>
                     </div>
                 </div>
-                <button id="predictButton" class="btn predict-btn" disabled>Detecter</button>
-            </section>
-                  {% if error %}
-    <div style="color: red; font-weight: bold; margin-top: 10px;">
-        {{ error }}
-    </div>
-{% endif %}
 
-            <section class="card results-section">
-                <h2>RESULTATS DE L'ANALYSE</h2>
-                {% if patient %}
-<div class="card">
-    <h3>Infos du Patient</h3>
-    <p><strong>Nom:</strong> {{ patient.nom }}</p>
-    <p><strong>Âge:</strong> {{ patient.age }}</p>
-    <p><strong>Genre:</strong> {{ patient.genre }}</p>
-    <img src="{{ patient.image.url }}" alt="Radiographie du patient" style="max-width: 200px;">
+                <!-- ✅ BOUTON SUBMIT -->
+                <button type="submit" id="predictButton" class="btn predict-btn" disabled>Detecter</button>
+            </form>
+        </section>
+
+        {% if error %}
+        <div style="color: red; font-weight: bold; margin-top: 10px;">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <section class="card results-section">
+            <h2>RESULTATS DE L'ANALYSE</h2>
+            {% if patient %}
+            <div class="card">
+                <h3>Infos du Patient</h3>
+                <p><strong>Nom:</strong> {{ patient.nom }}</p>
+                <p><strong>Âge:</strong> {{ patient.age }}</p>
+                <p><strong>Genre:</strong> {{ patient.genre }}</p>
+                {% if patient.image %}
+                    <img src="{{ patient.image.url }}" alt="Radiographie du patient" style="max-width: 200px;">
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <div class="results-content">
+                <p class="result-label">Status:</p>
+                <p id="detectionStatus" class="result-value">{{ prediction|default:"En attente de la prediction" }}</p>
+
+                <p class="result-label">Confiance:</p>
+                <p id="confidenceScore" class="result-value initial-state">N/A</p>
+            </div>
+        </section>
+    </main>
 </div>
-{% endif %}
 
-                <div class="results-content">
-                    <p class="result-label">Status:</p>
-                    <p id="detectionStatus" class="result-value initial-state">En attente de la prediction</p>
-
-                    <p class="result-label">Confiance:</p>
-                    <p id="confidenceScore" class="result-value initial-state">N/A</p>
-
-                    <div class="result-details">
-                        </div>
-                </div>
-            </section>
-
-            </main>
-    </div>
-
-    
-
-    
 <div id="patientModal" class="modal" style="display: none;">
-  <div class="modal-content">
-    <h3>Informations du patient</h3>
-    <label>Nom :</label>
-    <input type="text" id="patientName" required>
-    <button id="confirmPatient" class="btn">Confirmer</button>
-  </div>
+    <div class="modal-content">
+        <h3>Informations du patient</h3>
+        <label>Nom :</label>
+        <input type="text" id="patientName" required>
+        <button id="confirmPatient" class="btn">Confirmer</button>
+    </div>
 </div>
-    
-    <script src="{% static 'detection/js/script.js' %}"></script> 
+
+<script src="{% static 'detection/js/script.js' %}"></script>
+
+
 </body>
 </html>

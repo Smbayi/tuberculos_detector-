@@ -1,7 +1,12 @@
 from django import forms
-from .models import Patient
 
-class PatientForm(forms.ModelForm):
-    class Meta:
-        model = Patient
-        fields = ['nom', 'age', 'genre', 'image']
+GENRE_CHOICES = (
+    ('Homme', 'Homme'),
+    ('Femme', 'Femme'),
+)
+
+class PatientForm(forms.Form):
+    nom = forms.CharField(max_length=100, label="Nom")
+    age = forms.IntegerField(label="Âge")
+    genre = forms.ChoiceField(choices=GENRE_CHOICES, label="Genre")
+    image = forms.ImageField(label="Image Radiographique")

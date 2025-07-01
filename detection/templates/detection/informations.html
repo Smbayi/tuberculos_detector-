@@ -16,19 +16,18 @@
                 <form method="POST">
                     {% csrf_token %}
                     <label>Nom complet :</label>
-                    <input type="text" name="nom" required><br><br>
+                    <input type="text" name="nom" required>
 
                     <label>Âge :</label>
-                    <input type="number" name="age" required><br><br>
+                    <input type="number" name="age" required>
 
                     <label>Genre :</label>
                     <select name="genre" required>
                         <option value="Homme">Homme</option>
                         <option value="Femme">Femme</option>
-                    </select><br><br>
+                    </select>
 
-                    <a href="{% url 'detection' %}" class="btn"  >Valider et passer à la détection</a>
-                      
+                    <button type="submit" class="btn">Valider et passer à la détection</button>
                 </form>
             </section>
         </main>

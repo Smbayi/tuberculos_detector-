@@ -1,11 +1,13 @@
-from django.db import models
+# detection/models.py
 
-class Patient(models.Model):
-    nom = models.CharField(max_length=100)
-    age = models.IntegerField()
-    genre = models.CharField(max_length=10)
-    image = models.ImageField(upload_to='patients_images/', null=True, blank=True)
-    resultat_test = models.CharField(max_length=100, null=True, blank=True)
+from mongoengine import Document, StringField, IntField, FileField
+
+class Patient(Document):
+    nom = StringField(required=True, max_length=100)
+    age = IntField(required=True)
+    genre = StringField(required=True, max_length=20)
+    image = StringField()  # Chemin du fichier image (si tu ne stockes que le nom du fichier)
+    resultat_test = StringField()
 
     def __str__(self):
         return self.nom
