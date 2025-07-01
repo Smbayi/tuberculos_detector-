@@ -19,6 +19,7 @@ from .forms import PatientForm
 from bson import ObjectId
 from .forms import InformationsForm
 from django.core.files.storage import FileSystemStorage
+from .forms import InformationsForm, DetectionForm 
 
 
 
@@ -88,47 +89,14 @@ def predict_tb(image):
     return random.choice(["Tuberculose détectée", "Pas de tuberculose"])
 
 
-def detection(request):
-    prediction = None
-    patient = None
-
-    patient_id = request.session.get('current_patient_id')
-
-    if patient_id:
-        patient = Patient.objects.get(id=patient_id)
-
-        if request.method == 'POST' and 'image' in request.FILES:
-            image = request.FILES['image']
-            image_name = default_storage.save(f"images/{image.name}", image)
-
-            prediction = predict_tb(image)
-
-            # Mise à jour du patient
-            patient.image = image_name
-            patient.resultat_test = prediction
-            patient.save()
-
-    return render(request, 'detection/detection.html', {
-        'prediction': prediction,
-        'patient': patient
-    })
-
-
-
-
 def informations_view(request):
     if request.method == 'POST':
         form = InformationsForm(request.POST)
         if form.is_valid():
-            # Enregistre les infos dans MongoDB via MongoEngine
-            patient = Patient(
-                nom=form.cleaned_data['nom'],
-                age=form.cleaned_data['age'],
-                genre=form.cleaned_data['genre'],
-            )
-            patient.save()
-            # Stocker l'ID dans la session
-            request.session['patient_id'] = str(patient.id)
+            # Stocker les données dans la session
+            request.session['nom'] = form.cleaned_data['nom']
+            request.session['age'] = form.cleaned_data['age']
+            request.session['genre'] = form.cleaned_data['genre']
             return redirect('detection')
     else:
         form = InformationsForm()
@@ -136,43 +104,56 @@ def informations_view(request):
 
 
 def detection_view(request):
-    patient_id = request.session.get('patient_id')
-    if not patient_id:
-        return redirect('informations')
+    if request.method == 'POST':
+        form = DetectionForm(request.POST, request.FILES)
+        if form.is_valid():
+            image = form.cleaned_data['image']
+            # Sauvegarde de l’image
+            image_name = image.name
+            image_path = os.path.join('media/patients_images/', image_name)
 
-    # On récupère le patient depuis MongoEngine
-    try:
-        patient = Patient.objects.get(id=patient_id)
-    except Patient.DoesNotExist:
-        return redirect('informations')
+            with open(image_path, 'wb+') as f:
+                for chunk in image.chunks():
+                    f.write(chunk)
 
-    if request.method == 'POST' and 'image' in request.FILES:
-        image = request.FILES['image']
-        fs = FileSystemStorage(location='media/patients_images/')
-        filename = fs.save(image.name, image)
-        patient.image = f'patients_images/{filename}'
+            # Détection simulée
+            resultat = "Tuberculose détectée" if "t" in image_name.lower() else "Aucune tuberculose détectée"
 
-        # Simulation résultat IA
-        if 'tuberculose' in image.name.lower():
-            patient.resultat_test = "Atteint de la tuberculose"
-        else:
-            patient.resultat_test = "Non atteint"
+            # Création patient
+            patient = Patient(
+                nom=request.session.get('nom'),
+                age=request.session.get('age'),
+                genre=request.session.get('genre'),
+                image=image_path,
+                resultat_test=resultat
+            )
+            patient.save()
 
-        patient.save()
-        return redirect('patients')
+            return redirect('patients')
+    else:
+        form = DetectionForm()
 
-    return render(request, 'detection.html', {'patient': patient})
+    nom = request.session.get('nom')
+    age = request.session.get('age')
+    genre = request.session.get('genre')
+
+    return render(request, 'detection.html', {
+        'form': form,
+        'nom': nom,
+        'age': age,
+        'genre': genre
+    })
 
 
 def patients_view(request):
     patients = Patient.objects.all()
     total = patients.count()
-    atteints = patients.filter(resultat_test="Atteint de la tuberculose").count()
-    non_atteints = patients.filter(resultat_test="Non atteint").count()
+    positifs = patients.filter(resultat_test__icontains="détectée").count()
+    negatifs = total - positifs
 
     return render(request, 'patients.html', {
         'patients': patients,
         'total': total,
-        'atteints': atteints,
-        'non_atteints': non_atteints
+        'positifs': positifs,
+        'negatifs': negatifs
     })
